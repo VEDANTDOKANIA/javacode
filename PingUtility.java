@@ -13,6 +13,7 @@ public class PingUtility
     static final String greenColor = "\u001B[32m"; // ANSI escape code for green color
     static final String resetColor = "\u001B[0m"; // ANSI escape code to reset color to default
 
+    //Change function name ..  buildProcess ... discoveryName -- > discoveredName , ipAddresses --> ip (match variable name according to data structure, take care of singular and plural
     private static boolean buildProcessAndGetOutput(String discoveryName, String ipAddresses)
     {
         BufferedReader stdInputReader = null;
@@ -20,7 +21,12 @@ public class PingUtility
         Process process = null;
 
         String pingOutput;
+        
+        //pingOutput -- > output ... pingFlag change variable name 
+        
+        //use \n as a constant with name new line separator
 
+        //boolean is bydefault false? if not initalised
         boolean pingFlag = false;
 
         try
@@ -28,6 +34,7 @@ public class PingUtility
 
             System.out.println("\nPlease wait, we are going to ping " + ipAddresses + " ......\n");
 
+            //bash -c is required ? 
             var processBuilder = new ProcessBuilder(new ArrayList<>(Arrays.asList("bash", "-c", "fping -c 3 -q " + ipAddresses)));
 
             processBuilder.redirectErrorStream(true);
@@ -43,12 +50,14 @@ public class PingUtility
                 for (int index = 0; index < pingOutput.split("\n").length; index++)
                 {
 
+                    //complex logic for splitting , need to change the same , use regex matcher group instead of splitting so many times
                     String[] filteredResult = pingOutput.split("\n")[index].split(":")[1].split("=")[1].split("/");
 
                     if (filteredResult[0].trim().equals(filteredResult[1].trim()) && filteredResult[2].substring(0, filteredResult[2].indexOf("%")).equals("0"))
                     {
 
                         pingFlag = true;
+                        // pingOutput.split("\n")[index] can't we use variable instead of splitting two      times ?
 
                         System.out.println(discoveryName + " : " + pingOutput.split("\n")[index].split(":")[0].trim() + " is Up (Active)");
 
@@ -74,6 +83,7 @@ public class PingUtility
         catch (Exception exception)
         {
 
+            //mention the length of stack trace .. and instead of stacktrace print exception with proper logging level
             exception.printStackTrace();
 
         }
@@ -114,6 +124,8 @@ public class PingUtility
     private static void displayOptions()
     {
 
+        //if printLn than why \n at last ?
+        
         System.out.println("\nPlease enter a choice to proceed : \n");
 
         System.out.println("1.Discovery\n");
@@ -121,6 +133,8 @@ public class PingUtility
         System.out.print("Enter your choice here : ");
 
     }
+    
+    //no key term like provisionProfiles , either we have discoveryProfile or credentialProfile
 
     private static void startPolling(Map<String, String> provisionProfiles)
     {
@@ -151,6 +165,8 @@ public class PingUtility
 
                 while ((output = outputReader.readLine()) != null)
                 {
+                    
+                    //Aisa path nahi dalte bro .. Call karna bataunga mein yeh 
                     outputFile = new File("/home/yash/PingOutputs/" + provisionProfiles.get(output.split(":")[0].trim()) + " - " + output.split(":")[0].trim() + " provisioning.txt");
 
                     if (!(outputFile.exists()))
@@ -246,6 +262,7 @@ public class PingUtility
         else
         {
 
+            //msg should not be printed here .. propagate the return flag and print msg there 
             System.err.println("\nPlease enter valid Ip Address\n");
 
             return false;
@@ -264,8 +281,10 @@ public class PingUtility
 
         Map<String, String> profiles = new HashMap<>();
 
+        //Why linkedHashMap
         Map<String, String> provisionProfiles = new LinkedHashMap<>();
 
+        //no need of two different maps , think better logic or datastructure
         boolean pingFlag;
 
         try
